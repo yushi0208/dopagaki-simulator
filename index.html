@@ -1,43 +1,59 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
+
       content="width=device-width,
+
                initial-scale=1.0,
+
                maximum-scale=1.0,
+
                user-scalable=no">
 
-<title>Shorts</title>
+<title></title>
 
 <style>
+
 * {
+
   box-sizing: border-box;
+
   -webkit-tap-highlight-color: transparent;
+
 }
 
 html,
+
 body {
+
   margin: 0;
+
   padding: 0;
 
   width: 100%;
+
   height: 100%;
 
   overflow: hidden;
+
   background: #000;
+
 }
 
-/* =========================
-   フィード全体
-========================= */
-
 #feed {
+
   position: fixed;
+
   inset: 0;
 
   width: 100%;
+
   height: 100%;
 
   overflow: hidden;
@@ -45,265 +61,145 @@ body {
   touch-action: none;
 
   background: #000;
+
 }
 
-
-/* =========================
-   動画
-========================= */
+/* 動画 */
 
 .video {
+
   position: absolute;
 
   inset: 0;
 
   width: 100%;
+
   height: 100%;
 
   object-fit: cover;
 
-  user-select: none;
-  -webkit-user-drag: none;
+  transition: transform 0.35s ease;
 
   pointer-events: none;
 
-  transition:
-    transform 0.35s ease;
 }
 
+/* 次の動画 */
 
-/* 次の動画用 */
 #next {
+
   transform: translateY(100%);
-}
 
-
-/* =========================
-   黒い切り替えレイヤー
-========================= */
-
-#transition {
-  position: absolute;
-
-  inset: 0;
-
-  background: #000;
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition: opacity 0.15s ease;
-}
-
-
-/* =========================
-   右側ボタン風
-========================= */
-
-#buttons {
-  position: absolute;
-
-  right: 12px;
-  bottom: 120px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 20px;
-
-  color: white;
-
-  font-size: 28px;
-
-  pointer-events: none;
-}
-
-.button {
-  text-align: center;
-}
-
-.button span {
-  display: block;
-
-  font-size: 12px;
-
-  margin-top: 3px;
-}
-
-
-/* =========================
-   下の情報
-========================= */
-
-#info {
-  position: absolute;
-
-  left: 15px;
-  bottom: 25px;
-
-  color: white;
-
-  text-shadow:
-    0 1px 4px rgba(0,0,0,0.8);
-
-  pointer-events: none;
-}
-
-#account {
-  font-weight: bold;
-  font-size: 16px;
-
-  margin-bottom: 8px;
-}
-
-#title {
-  font-size: 15px;
-}
-
-
-/* =========================
-   上部
-========================= */
-
-#top {
-  position: absolute;
-
-  top: 15px;
-  left: 0;
-
-  width: 100%;
-
-  text-align: center;
-
-  color: white;
-
-  font-size: 16px;
-
-  font-weight: bold;
-
-  z-index: 10;
-
-  pointer-events: none;
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
 <div id="feed">
 
-  <!-- 1枚目 -->
-  <img
+  <!-- 現在の動画 -->
+
+  <video
+
     id="current"
+
     class="video"
-    src="short.png"
-    alt=""
-    draggable="false"
-  >
+
+    src="short.mp4"
+
+    autoplay
+
+    muted
+
+    playsinline
+
+    loop>
+
+  </video>
 
   <!-- 次の動画 -->
-  <img
+
+  <video
+
     id="next"
+
     class="video"
-    src="short.png"
-    alt=""
-    draggable="false"
-  >
 
-  <!-- 切り替え -->
-  <div id="transition"></div>
+    src="short.mp4"
 
+    autoplay
 
-  <!-- 上 -->
-  <div id="top">
-    Shorts
-  </div>
+    muted
 
+    playsinline
 
-  <!-- 右側 -->
-  <div id="buttons">
+    loop>
 
-    <div class="button">
-      ♡
-      <span>いいね</span>
-    </div>
-
-    <div class="button">
-      💬
-      <span>コメント</span>
-    </div>
-
-    <div class="button">
-      ↗
-      <span>共有</span>
-    </div>
-
-  </div>
-
-
-  <!-- 動画情報 -->
-  <div id="info">
-
-    <div id="account">
-      @sample
-    </div>
-
-    <div id="title">
-      何回スワイプしても同じ動画
-    </div>
-
-  </div>
+  </video>
 
 </div>
 
-
 <script>
 
-/* =========================
-   スワイプ
-========================= */
-
 const feed = document.getElementById("feed");
+
 const current = document.getElementById("current");
+
 const next = document.getElementById("next");
-const transition = document.getElementById("transition");
 
 let startY = 0;
+
 let currentY = 0;
 
 let swiping = false;
+
 let changing = false;
 
+/* =========================
 
-/* 指をつける */
+   スワイプ開始
+
+========================= */
+
 feed.addEventListener("touchstart", function(e) {
 
   if (e.touches.length !== 1) return;
 
   startY = e.touches[0].clientY;
+
   currentY = startY;
 
   swiping = true;
 
 }, { passive: false });
 
+/* =========================
 
-/* 指を動かす */
+   スワイプ中
+
+========================= */
+
 feed.addEventListener("touchmove", function(e) {
 
   if (!swiping) return;
 
   currentY = e.touches[0].clientY;
 
+  /* 普通のスクロールを防止 */
+
   e.preventDefault();
 
 }, { passive: false });
 
+/* =========================
 
-/* 指を離す */
+   指を離す
+
+========================= */
+
 feed.addEventListener("touchend", function(e) {
 
   if (!swiping) return;
@@ -312,12 +208,12 @@ feed.addEventListener("touchend", function(e) {
 
   const distance = startY - currentY;
 
-
   /*
-    下 → 上
 
-    60px以上なら
-    次の動画へ行く動作
+    下 → 上に60px以上
+
+    スワイプしたら次へ
+
   */
 
   if (distance >= 60 && !changing) {
@@ -328,57 +224,70 @@ feed.addEventListener("touchend", function(e) {
 
 }, { passive: false });
 
-
 /* =========================
+
    次の動画
+
 ========================= */
 
 function showNext() {
 
   changing = true;
 
-
   /*
+
     次の動画を上へ
+
   */
 
   next.style.transform = "translateY(0)";
 
   current.style.transform = "translateY(-100%)";
 
-
   setTimeout(function() {
 
     /*
-      ここがポイント。
 
-      「次の動画」も
-      全く同じ short.png。
+      ★重要★
 
-      だから何回やっても
-      同じ動画。
+      nextもcurrentも
+
+      同じ short.mp4。
+
+      だから何回スワイプしても
+
+      同じ動画が出る。
+
     */
 
     current.style.transition = "none";
+
     next.style.transition = "none";
 
     current.style.transform = "translateY(0)";
+
     next.style.transform = "translateY(100%)";
 
+    /* 動画を最初から再生 */
 
-    /*
-      少し待って
-      transitionを元に戻す
-    */
+    current.currentTime = 0;
+
+    current.play();
+
+    next.currentTime = 0;
+
+    next.play();
 
     requestAnimationFrame(function() {
 
       requestAnimationFrame(function() {
 
         current.style.transition =
+
           "transform 0.35s ease";
 
         next.style.transition =
+
           "transform 0.35s ease";
 
         changing = false;
@@ -391,9 +300,10 @@ function showNext() {
 
 }
 
-
 /* =========================
-   ブラウザのスクロール禁止
+
+   スクロール完全禁止
+
 ========================= */
 
 document.addEventListener("touchmove", function(e) {
@@ -405,4 +315,5 @@ document.addEventListener("touchmove", function(e) {
 </script>
 
 </body>
+
 </html>
